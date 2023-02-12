@@ -91,11 +91,12 @@ def ServerProgram(config):
             logging.info(f'Connection from: {str(address)}')
             data = conn.recv(1024)
             if not data:
+                logging.info("No data")
                 continue
             else:
                 data = pickle.loads(data)
+                logging.info(f"Received from client: {data}")
 
-            logging.info(f"Received from client: {data}")
             chosenMachineIp = ChooseMachine(data)
             conn.send(chosenMachineIp.encode("utf-8"))
             logging.info(f'Connect this user to {chosenMachineIp}')
