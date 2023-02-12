@@ -76,8 +76,8 @@ def ChooseMachine(data):
 
 
 def ServerProgram(config):
-    host = config["host"][0]
-    port = config["port"][0]
+    host = config["host"]
+    port = config["port"]
     logging.info('Host: ', host)
     logging.info('Port: ', port)
 
