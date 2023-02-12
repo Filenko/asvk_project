@@ -27,7 +27,7 @@ def GetAllMachines(folder):
 def LoadHistory(path):
     history = {}
     with open(path, "wb") as f:
-        logging.debug('History loaded from: ', path)
+        logging.debug(f'History loaded from: {path}')
         pickle.dump(history, f)
     return history
 
@@ -78,9 +78,8 @@ def ChooseMachine(data):
 def ServerProgram(config):
     host = config["host"]
     port = config["port"]
-    print(host, port, sep="\n")
-    logging.info('Host: ', host)
-    logging.info('Port: ', port)
+    logging.info(f'Host: {host}')
+    logging.info(f'Port: {port}')
 
     server_socket = socket.socket()
     server_socket.bind((host, port))
@@ -89,14 +88,14 @@ def ServerProgram(config):
     try:
         while True:
             conn, address = server_socket.accept()
-            logging.info('Connection from: ', str(address))
+            logging.info(f'Connection from: {str(address)}')
             data = conn.recv(1024)
             if not data:
                 continue
             else:
                 data = pickle.loads(data)
 
-            logging.info("Received from client: ", data)
+            logging.info(f"Received from client: {data}")
             chosenMachineIp = ChooseMachine(data)
             conn.send(chosenMachineIp.encode("utf-8"))
             logging.info(f'Connect this user to {chosenMachineIp}')
