@@ -28,7 +28,7 @@ def LoadHistory(path):
     history = {}
     with open(path, "wb") as f:
         logging.debug(f'History loaded from: {path}')
-        pickle.dump(history, f)
+        history = pickle.load(f)
     return history
 
 
