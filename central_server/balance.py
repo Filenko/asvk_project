@@ -1,3 +1,4 @@
+import os.path
 from os import listdir
 import json
 import socket
@@ -26,9 +27,10 @@ def GetAllMachines(folder):
 
 def LoadHistory(path):
     history = {}
-    with open(path, "rb") as f:
-        history = pickle.load(f)
-        logging.debug(f'History loaded from: {path}')
+    if os.path.exists(path):
+        with open(path, "rb") as f:
+            history = pickle.load(f)
+            logging.debug(f'History loaded from: {path}')
     return history
 
 
