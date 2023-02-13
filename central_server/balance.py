@@ -100,8 +100,8 @@ def ServerProgram(config):
             chosenMachineIp = ChooseMachine(data)
             conn.send(chosenMachineIp.encode("utf-8"))
             logging.info(f'Connect this user to {chosenMachineIp}')
-    except Exception:
-        print(Exception)
+    except Exception as e:
+        logging.error(str(e))
         server_socket.close()
 
 
