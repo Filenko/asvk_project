@@ -61,6 +61,7 @@ def GetCurrentMachines():
 def ChooseMachine(data):
     hist = LoadHistory("./history.pickle")
     machines = GetCurrentMachines()
+    logging.debug("Loaded current machines!")
     machines.sort(key=lambda x: int(x["load_5"]))
 
     if data["mac"] in hist:
