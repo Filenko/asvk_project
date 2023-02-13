@@ -54,7 +54,7 @@ def GetCurrentMachines():
             minute = datetime.strptime(machineInfo["time"], "%H:%M:%S").minute
             if now.hour == hour and now.minute == minute:
                 machines.append(machineInfo)
-    logging.debug(f"It's {len(machines)} now")
+    logging.debug(f"It's {len(machines)} machines are ready now")
     return machines
 
 
@@ -100,7 +100,8 @@ def ServerProgram(config):
             chosenMachineIp = ChooseMachine(data)
             conn.send(chosenMachineIp.encode("utf-8"))
             logging.info(f'Connect this user to {chosenMachineIp}')
-    except:
+    except Exception:
+        print(Exception)
         server_socket.close()
 
 
