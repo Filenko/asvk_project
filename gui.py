@@ -21,7 +21,6 @@ def ButtonCallBack():
     }
     host = "172.20.10.5"
     print("HOST:", host)
-    port = 5000
 
     ssh = paramiko.SSHClient()
     ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
@@ -30,17 +29,17 @@ def ButtonCallBack():
     dest_addr = ('127.0.0.1', 5000)
     local_forward_socket = transport.open_channel("direct-tcpip", (dest_addr), ('127.0.0.1', 5005))
 
-    local_forward_socket.sendall(pickle.dumps(json_data))  # send message
+    local_forward_socket.sendall(pickle.dumps(json_data))
 
-    data = local_forward_socket.recv(1024).decode("utf-8")  # receive response
-    print('Received from server: ' + data)  # show in terminal
+    data = local_forward_socket.recv(1024).decode("utf-8")
+    print('Received from server: ' + data)
 
     base_ip = host
     print(f"ssh -J root@{base_ip} root@{data}")
 
     subprocess.Popen(f"ssh -J root@{base_ip} root@{data}", shell=True).communicate()
 
-    local_forward_socket.close()  # close the connection
+    local_forward_socket.close()
     ssh.close()
 
 

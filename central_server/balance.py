@@ -54,6 +54,7 @@ def GetCurrentMachines():
             now = datetime.now()
             hour = datetime.strptime(machineInfo["time"], "%H:%M:%S").hour
             minute = datetime.strptime(machineInfo["time"], "%H:%M:%S").minute
+            logging.debug(f'Machine with IP {machineInfo["ip"]} sent last info at {machineInfo["time"]}')
             if now.hour == hour and now.minute == minute:
                 machines.append(machineInfo)
     logging.debug(f"It's {len(machines)} machines are ready now")
