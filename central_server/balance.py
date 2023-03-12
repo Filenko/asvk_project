@@ -91,18 +91,12 @@ def ChooseMachine(data):
 
 def ServerProgram(config, args):
 
-    ip = subprocess.check_output("echo $SSH_CLIENT | awk '{print $1}'", shell=True).decode().strip()
-    mac = subprocess.check_output("arp -a $(echo $SSH_CLIENT | awk '{print $1}') | awk '{print $4}'", shell=True).decode().strip()
-    print(ip, mac)
+    data = {}
+    data["ip"] = subprocess.check_output("echo $SSH_CLIENT | awk '{print $1}'", shell=True).decode().strip()
+    data["mac"] = subprocess.check_output("arp -a $(echo $SSH_CLIENT | awk '{print $1}') | awk '{print $4}'", shell=True).decode().strip()
 
-    # chosenMachineIp = ChooseMachine(data)
-    # conn.send(chosenMachineIp.encode("utf-8"))
-    #
-    #     logging.info(f'Connect this user to {chosenMachineIp}')
-    # except Exception as e:
-    #     logging.error(str(e))
-    #     server_socket.close()
-
+    chosenMachineIp = ChooseMachine(data)
+    print(chosenMachineIp)
 
 if __name__ == '__main__':
     config = LoadConfig()
