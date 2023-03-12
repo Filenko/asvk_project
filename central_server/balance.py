@@ -5,6 +5,7 @@ import socket
 import pickle
 from datetime import datetime
 import logging
+import ping3
 
 logging.basicConfig(
     level=logging.DEBUG,
@@ -12,6 +13,7 @@ logging.basicConfig(
     handlers=[logging.StreamHandler()]
 )
 
+MACHINE_IS_UNREACHABLE_MESSAGE = "Machine is unreachable."
 
 def machines_find(machines, ip):
     for machine in machines:
@@ -73,40 +75,30 @@ def ChooseMachine(data):
             return hist[data['mac']]
         else:
             logging.info(f"User was connected to {hist[data['mac']]}. But this machine is unavailable now.")
-
-    hist[data["mac"]] = machines[0]["ip"]
-    SaveHistory(hist, "history.pickle")
-    return machines[0]["ip"]
+    for i in range(len(machines)):
+        logging.debug(f"Checking machine {i}")
+        pingTime = ping3.ping(machines[i]["ip"], timeout=1)
+        if pingTime is not None:
+            logging.debug(f"Machine {i} is ready. Return it.")
+            hist[data["mac"]] = machines[i]["ip"]
+            SaveHistory(hist, "history.pickle")
+            return machines[i]["ip"]
+        logging.debug(f"Machine {i} is unreachable!")
+    return None
 
 
 def ServerProgram(config):
-    host = config["host"]
-    port = config["port"]
-    logging.info(f'Host: {host}')
-    logging.info(f'Port: {port}')
 
-    server_socket = socket.socket()
-    server_socket.bind((host, port))
-    server_socket.listen(1)
-
-    try:
-        while True:
-            conn, address = server_socket.accept()
-            logging.info(f'Connection from: {str(address)}')
-            data = conn.recv(1024)
-            if not data:
-                logging.info("No data")
-                continue
-            else:
-                data = pickle.loads(data)
-                logging.info(f"Received from client: {data}")
-
-            chosenMachineIp = ChooseMachine(data)
-            conn.send(chosenMachineIp.encode("utf-8"))
-            logging.info(f'Connect this user to {chosenMachineIp}')
-    except Exception as e:
-        logging.error(str(e))
-        server_socket.close()
+    hostname = socket.gethostname()
+    ip_address = socket.gethostbyname(hostname)
+    print(hostname, ip_address)
+    # chosenMachineIp = ChooseMachine(data)
+    # conn.send(chosenMachineIp.encode("utf-8"))
+    #
+    #     logging.info(f'Connect this user to {chosenMachineIp}')
+    # except Exception as e:
+    #     logging.error(str(e))
+    #     server_socket.close()
 
 
 if __name__ == '__main__':
