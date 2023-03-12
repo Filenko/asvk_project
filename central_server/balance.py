@@ -81,7 +81,7 @@ def ChooseMachine(data):
         logging.debug(f"Checking machine {i}")
         pingTime = ping3.ping(machines[i]["ip"], timeout=1)
         if pingTime is not None:
-            logging.debug(f"Machine {i} is ready. Return it.")
+            logging.debug(f"Machine {i} is ready with ping {pingTime}. Return it.")
             hist[data["mac"]] = machines[i]["ip"]
             SaveHistory(hist, "history.pickle")
             return machines[i]["ip"]
@@ -97,6 +97,9 @@ def ServerProgram(config, args):
 
     chosenMachineIp = ChooseMachine(data)
     print(chosenMachineIp)
+    if chosenMachineIp is not None:
+        subprocess.Popen(f"ssh root@{chosenMachineIp}", shell=True).communicate()
+
 
 if __name__ == '__main__':
     config = LoadConfig()
