@@ -94,8 +94,10 @@ def ServerProgram(config):
     ip_address = result.decode().strip()
 
     print("IP address:", ip_address)
+
     result = subprocess.check_output(
-        "echo $(who -m) | awk '{print $NF}' | tr -d '()' | xargs arp | awk 'NR==2 {print $3}'", shell=True)
+        "tcpdump -i $(echo $SSH_TTY | cut -d/ -f3) -c 1 ether src $(echo $SSH_CLIENT | awk '{print $1}') | awk '{print $2}'",
+        shell=True)
     mac_address = result.decode().strip()
 
     print("MAC address:", mac_address)
