@@ -6,6 +6,7 @@ import pickle
 from datetime import datetime
 import logging
 import ping3
+import subprocess
 
 logging.basicConfig(
     level=logging.DEBUG,
@@ -89,9 +90,15 @@ def ChooseMachine(data):
 
 def ServerProgram(config):
 
-    hostname = socket.gethostname()
-    ip_address = socket.gethostbyname(hostname)
-    print(hostname, ip_address)
+    result = subprocess.check_output("echo $SSH_CLIENT | awk '{print $1}'", shell=True)
+    ip_address = result.decode().strip()
+
+    print("IP address:", ip_address)
+    result = subprocess.check_output(
+        "echo $(who -m) | awk '{print $NF}' | tr -d '()' | xargs arp | awk 'NR==2 {print $3}'", shell=True)
+    mac_address = result.decode().strip()
+
+    print("MAC address:", mac_address)
     # chosenMachineIp = ChooseMachine(data)
     # conn.send(chosenMachineIp.encode("utf-8"))
     #
