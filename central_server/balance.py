@@ -96,7 +96,7 @@ def ServerProgram(config):
     print("IP address:", ip_address)
 
     result = subprocess.check_output(
-        "tcpdump -i $(echo $SSH_TTY | cut -d/ -f3) -c 1 ether src $(echo $SSH_CLIENT | awk '{print $1}') | awk '{print $2}'",
+        "grep -Po 'Accepted\s.*?\sfor\s.*?\s.*\s([a-fA-F0-9]{2}:){5}[a-fA-F0-9]{2}' /var/log/auth.log | tail -1 | awk '{print $NF}'",
         shell=True)
     mac_address = result.decode().strip()
 
