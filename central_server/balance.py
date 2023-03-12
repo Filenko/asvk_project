@@ -7,6 +7,7 @@ from datetime import datetime
 import logging
 import ping3
 import subprocess
+import sys
 
 logging.basicConfig(
     level=logging.DEBUG,
@@ -88,11 +89,11 @@ def ChooseMachine(data):
     return None
 
 
-def ServerProgram(config):
+def ServerProgram(config, args):
 
     result = subprocess.check_output("echo $SSH_CLIENT | awk '{print $1}'", shell=True)
     ip_address = result.decode().strip()
-
+    print("ARGS", args)
     print("IP address:", ip_address)
 
     result = subprocess.check_output("arp -a $(echo $SSH_CLIENT | awk '{print $1}') | awk '{print $4}'", shell=True)
@@ -110,4 +111,4 @@ def ServerProgram(config):
 
 if __name__ == '__main__':
     config = LoadConfig()
-    ServerProgram(config)
+    ServerProgram(config, sys.argv)
