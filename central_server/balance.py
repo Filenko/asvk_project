@@ -91,15 +91,10 @@ def ChooseMachine(data):
 
 def ServerProgram(config, args):
 
-    result = subprocess.check_output("echo $SSH_CLIENT | awk '{print $1}'", shell=True)
-    ip_address = result.decode().strip()
-    print("ARGS", args)
-    print("IP address:", ip_address)
+    ip = subprocess.check_output("echo $SSH_CLIENT | awk '{print $1}'", shell=True)
+    mac = subprocess.check_output("arp -a $(echo $SSH_CLIENT | awk '{print $1}') | awk '{print $4}'", shell=True).decode().strip()
+    print(ip, mac)
 
-    result = subprocess.check_output("arp -a $(echo $SSH_CLIENT | awk '{print $1}') | awk '{print $4}'", shell=True)
-    mac_address = result.decode().strip()
-
-    print("MAC address:", mac_address)
     # chosenMachineIp = ChooseMachine(data)
     # conn.send(chosenMachineIp.encode("utf-8"))
     #
