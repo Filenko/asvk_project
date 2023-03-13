@@ -100,7 +100,7 @@ def ServerProgram(config, args):
     data["mac"] = subprocess.check_output("arp -a $(echo $SSH_CLIENT | awk '{print $1}') | awk '{print $4}'", shell=True).decode().strip()
 
     chosenMachineIp = ChooseMachine(data)
-    logging.debug(chosenMachineIp)
+    logging.debug(f"Chose machine function returned: {chosenMachineIp}")
     if chosenMachineIp is not None:
         subprocess.Popen(f"ssh root@{chosenMachineIp}").communicate()
 
