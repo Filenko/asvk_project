@@ -73,8 +73,12 @@ def ChooseMachine(data):
 
     if data["mac"] in hist:
         if machines_find(machines, hist[data["mac"]]):
-            logging.info(f"Connect this user to {hist[data['mac']]}. He was already connected to this machine.")
-            return hist[data['mac']]
+            pingTime = ping3.ping(hist[data['mac']], timeout=1)
+            if pingTime is not None:
+                logging.info(f"Connect this user to {hist[data['mac']]} with ping {pingTime}. He was already connected to this machine.")
+                return hist[data['mac']]
+            else:
+                logging.info(f"User was connected to {hist[data['mac']]}. But this machine is unavailable now.")
         else:
             logging.info(f"User was connected to {hist[data['mac']]}. But this machine is unavailable now.")
     for i in range(len(machines)):
@@ -98,7 +102,7 @@ def ServerProgram(config, args):
     chosenMachineIp = ChooseMachine(data)
     print(chosenMachineIp)
     if chosenMachineIp is not None:
-        subprocess.Popen(f"ssh root@{chosenMachineIp}", shell=True).communicate()
+        subprocess.Popen(f"ssh root@{chosenMachineIp}").communicate()
 
 
 if __name__ == '__main__':
