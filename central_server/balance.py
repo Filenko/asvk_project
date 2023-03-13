@@ -102,7 +102,7 @@ def ServerProgram(config, args):
     chosenMachineIp = ChooseMachine(data)
     logging.debug(f"Chose machine function returned: {chosenMachineIp}")
     if chosenMachineIp is not None:
-        subprocess.Popen(f"ssh root@{chosenMachineIp}").communicate()
+        subprocess.Popen(f"ssh root@10.10.10.2").communicate()
 
 
 if __name__ == '__main__':
