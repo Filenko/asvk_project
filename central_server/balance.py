@@ -93,7 +93,7 @@ def ChooseMachine(data):
     return None
 
 
-def ServerProgram(config, args):
+def ServerProgram(args):
 
     data = {}
     data["ip"] = subprocess.check_output("echo $SSH_CLIENT | awk '{print $1}'", shell=True).decode().strip()
@@ -106,5 +106,4 @@ def ServerProgram(config, args):
 
 
 if __name__ == '__main__':
-    config = LoadConfig()
-    ServerProgram(config, sys.argv)
+    ServerProgram(sys.argv)

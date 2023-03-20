@@ -35,7 +35,7 @@ for (key, value) in dct.items():
 
 with open(f'machine_{machine_number}.pickle', 'wb') as handle:
     pickle.dump(dct, handle, protocol=pickle.HIGHEST_PROTOCOL)
-subprocess.run(["scp", f"machine_{machine_number}.pickle", f"root@10.10.10.1:~/machines/machine_{machine_number}.pickle"])
+subprocess.run(["scp", f"machine_{machine_number}.pickle", f"balance@10.10.10.1:~/machines/machine_{machine_number}.pickle"])
 
 
 
