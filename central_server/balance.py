@@ -5,7 +5,6 @@ import socket
 import pickle
 from datetime import datetime
 import logging
-import ping3
 import subprocess
 import sys
 
@@ -17,6 +16,13 @@ logging.basicConfig(
 
 MACHINE_IS_UNREACHABLE_MESSAGE = "Machine is unreachable."
 
+def ping(host):
+    try:
+        ping_output = subprocess.check_output(["ping", "-c", "1", "-W", "1", host])
+        ping_time = float(ping_output.decode().split("time=")[1].split(" ms")[0])
+        return ping_time
+    except subprocess.CalledProcessError:
+        return None
 def machines_find(machines, ip):
     for machine in machines:
         if machine["ip"] == ip:
@@ -73,7 +79,7 @@ def ChooseMachine(data):
 
     if data["mac"] in hist:
         if machines_find(machines, hist[data["mac"]]):
-            pingTime = ping3.ping(hist[data['mac']], timeout=1)
+            pingTime = ping(hist[data['mac']])
             if pingTime is not None:
                 logging.info(f"Connect this user to {hist[data['mac']]} with ping {pingTime}. He was already connected to this machine.")
                 return hist[data['mac']]
@@ -83,7 +89,7 @@ def ChooseMachine(data):
             logging.info(f"User was connected to {hist[data['mac']]}. But this machine is unavailable now.")
     for i in range(len(machines)):
         logging.debug(f"Checking machine {i}")
-        pingTime = ping3.ping(machines[i]["ip"], timeout=1)
+        pingTime = ping(machines[i]["ip"])
         if pingTime is not None:
             logging.debug(f"Machine {i} is ready with ping {pingTime}. Return it.")
             hist[data["mac"]] = machines[i]["ip"]
@@ -101,9 +107,11 @@ def ServerProgram(args):
 
     chosenMachineIp = ChooseMachine(data)
     logging.debug(f"Chose machine function returned: {chosenMachineIp}")
+    name = args[1]
     if chosenMachineIp is not None:
-        subprocess.Popen(f"ssh root@10.10.10.2").communicate()
+        subprocess.Popen(f"ssh {name}@10.10.10.2").communicate()
 
 
 if __name__ == '__main__':
     ServerProgram(sys.argv)
+
