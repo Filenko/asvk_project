@@ -1,12 +1,12 @@
 import os.path
 from os import listdir
 import json
-import socket
 import pickle
 from datetime import datetime
 import logging
 import subprocess
 import sys
+import time
 
 logging.basicConfig(
     level=logging.DEBUG,
@@ -62,8 +62,12 @@ def GetCurrentMachines():
         with open(f"./machines/{machine_info}", "rb") as input_file:
             machineInfo = pickle.load(input_file)
             now = datetime.now()
-            hour = datetime.strptime(machineInfo["time"], "%H:%M:%S").hour
-            minute = datetime.strptime(machineInfo["time"], "%H:%M:%S").minute
+
+            machineTimeStamp = os.stat(f"./machines/{machine_info}").st_mtime
+            machineTime = datetime.fromtimestamp(machineTime)
+
+            hour = machineTime.hour
+            minute = machineTime.minute
             logging.debug(f'Machine with IP {machineInfo["ip"]} sent last info at {machineInfo["time"]}')
             if now.hour == hour and now.minute == minute:
                 machines.append(machineInfo)
@@ -114,4 +118,7 @@ def ServerProgram(args):
 
 if __name__ == '__main__':
     ServerProgram(sys.argv)
+
+
+
 
