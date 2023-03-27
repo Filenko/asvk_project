@@ -1,0 +1,9 @@
+[Unit]
+Requires=my.service
+
+[Timer]
+Unit = my.service
+OnUnitActiveSec=10s
+AccuracySec=1s
+[Install]
+WantedBy=timers.target
