@@ -113,7 +113,7 @@ def ServerProgram(args):
     logging.debug(f"Chose machine function returned: {chosenMachineIp}")
     name = args[1]
     if chosenMachineIp is not None:
-        subprocess.Popen(f"ssh {name}@10.10.10.2").communicate()
+        subprocess.Popen([f'ssh', f'{name}@{chosenMachineIp}']).communicate()
 
 
 if __name__ == '__main__':
