@@ -64,7 +64,7 @@ def GetCurrentMachines():
             now = datetime.now()
 
             machineTimeStamp = os.stat(f"./machines/{machine_info}").st_mtime
-            machineTime = datetime.fromtimestamp(machineTime)
+            machineTime = datetime.fromtimestamp(machineTimeStamp)
 
             hour = machineTime.hour
             minute = machineTime.minute
