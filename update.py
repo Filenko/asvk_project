@@ -16,9 +16,6 @@ if working_type == 1:
     src_file = "./current_version/central_server/balance.py"
     dst_file = "./balance.py"
     shutil.copy(src_file, dst_file)
-    src_file = "./current_version/central_server/config.py"
-    dst_file = "./config.json"
-    shutil.copy(src_file, dst_file)
 elif working_type == 2:
     src_file = "./current_version/on_server.py"
     dst_file = "./on_server.py"
