@@ -59,10 +59,10 @@ ip l set eth1 up
 systemctl start my.timer
 ```
 
+- Создать пользователя/пользователей, в которых будут входить клиенты
+
 ## Как использовать клиент:
 
-- В 22 строчке программы gui.py поменять переменную host на адрес центрального сервера
-- Выполнить
 ```shell
-python3 gui.py
+ssh balance@<ip address> python3 balance.py <name>
 ```
