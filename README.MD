@@ -16,7 +16,7 @@
 - Запустить update.py и ввести цифру 2
 
 ```python
-subprocess.run(["scp", f"machine_{machine_number}.pickle", f"root@10.10.10.1:~/machines/machine_{machine_number}.pickle"])
+subprocess.run(["scp", f"machine_{machine_number}.pickle", f"balance@10.10.10.1:~/machines/machine_{machine_number}.pickle"])
 ```
 В строке 39 (выше) поменять 10.10.10.1 на ip адрес центрального сервера
 
@@ -66,3 +66,9 @@ systemctl start my.timer
 ```shell
 ssh balance@<ip address> python3 balance.py <name>
 ```
+
+## Как работает scp
+
+* Необходимо выполнить команду ssh balance@<ip address> python3 balance.py giveAddress
+* Она вернет ip адрес севрера, к которому вас подключит.
+* Затем выполнить команду ```shell rsync -avz -partial --progress --rsh="ssh -J balance@192.168.1.57" ~/path <name>@<address of server>:~/```

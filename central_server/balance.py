@@ -9,12 +9,13 @@ import sys
 import time
 
 logging.basicConfig(
-    level=logging.DEBUG,
+    level=logging.INFO,
     format='[%(levelname)s]: %(message)s',
     handlers=[logging.StreamHandler()]
 )
 
 MACHINE_IS_UNREACHABLE_MESSAGE = "Machine is unreachable."
+
 
 def ping(host):
     try:
@@ -23,6 +24,8 @@ def ping(host):
         return ping_time
     except subprocess.CalledProcessError:
         return None
+
+
 def machines_find(machines, ip):
     for machine in machines:
         if machine["ip"] == ip:
@@ -41,6 +44,8 @@ def LoadHistory(path):
         with open(path, "rb") as f:
             history = pickle.load(f)
             logging.debug(f'History loaded from: {path}')
+    else:
+        logging.debug(f'No history file at: {path}')
     return history
 
 
@@ -50,8 +55,12 @@ def SaveHistory(history, path):
 
 
 def LoadConfig(path="config.json"):
-    with open(path, 'r') as file:
-        loadedConfig = json.load(file)
+    loadedConfig = {}
+    if os.path.exists(path):
+        with open(path, 'r') as file:
+            loadedConfig = json.load(file)
+    else:
+        logging.debug(f'No config file at: {path}')
     return loadedConfig
 
 
@@ -81,44 +90,72 @@ def ChooseMachine(data):
     logging.debug("Loaded current machines!")
     machines.sort(key=lambda x: int(x["load_5"]))
 
-    if data["mac"] in hist:
-        if machines_find(machines, hist[data["mac"]]):
-            pingTime = ping(hist[data['mac']])
+    if data["fingerprint"] in hist:
+        if machines_find(machines, hist[data["fingerprint"]]):
+            pingTime = ping(hist[data['fingerprint']])
             if pingTime is not None:
-                logging.info(f"Connect this user to {hist[data['mac']]} with ping {pingTime}. He was already connected to this machine.")
-                return hist[data['mac']]
+                logging.debug(f"Connect this user to {hist[data['fingerprint']]} with ping {pingTime}. He was already connected to this machine.")
+                return hist[data['fingerprint']]
             else:
-                logging.info(f"User was connected to {hist[data['mac']]}. But this machine is unavailable now.")
+                logging.debug(f"User was connected to {hist[data['fingerprint']]}. But this machine is unavailable now.")
         else:
-            logging.info(f"User was connected to {hist[data['mac']]}. But this machine is unavailable now.")
+            logging.debug(f"User was connected to {hist[data['fingerprint']]}. But this machine is unavailable now.")
     for i in range(len(machines)):
         logging.debug(f"Checking machine {i}")
         pingTime = ping(machines[i]["ip"])
         if pingTime is not None:
             logging.debug(f"Machine {i} is ready with ping {pingTime}. Return it.")
-            hist[data["mac"]] = machines[i]["ip"]
+            hist[data["fingerprint"]] = machines[i]["ip"]
             SaveHistory(hist, "history.pickle")
             return machines[i]["ip"]
         logging.debug(f"Machine {i} is unreachable!")
     return None
 
 
+def readServersFingerPrints(path='servers'):
+    servers = set()
+    if os.path.exists(path):
+        with open(path, 'r') as f:
+            for line in f.readlines():
+                servers.add(line.strip())
+    else:
+        logging.debug(f"No servers file at {path}")
+
+    return servers
+
 def ServerProgram(args):
 
+    serversFingerPrints = readServersFingerPrints()
+
+    if os.getenv('SSH_KEY_FINGERPRINT') in serversFingerPrints:
+        serverParameters = json.loads(args[1])
+        serverParameters["time"] = datetime.now()
+        serverParameters["ip"] = os.getenv('SSH_CONNECTION').split()[0]
+        with open(f'./machines/machine{serverParameters["machine_number"]}.pickle', 'wb') as f:
+            pickle.dump(serverParameters, f)
+        return
+
+    giveAddress = False
+    if len(args) >= 2 and args[1] == "giveAddress":
+        giveAddress = True
+
     data = {}
-    data["ip"] = subprocess.check_output("echo $SSH_CLIENT | awk '{print $1}'", shell=True).decode().strip()
-    data["mac"] = subprocess.check_output("arp -a $(echo $SSH_CLIENT | awk '{print $1}') | awk '{print $4}'", shell=True).decode().strip()
+    data["ip"] = os.getenv('SSH_CONNECTION').split()[0]
+    data["fingerprint"] = os.getenv('SSH_KEY_FINGERPRINT')
 
     chosenMachineIp = ChooseMachine(data)
     logging.debug(f"Chose machine function returned: {chosenMachineIp}")
+    if len(args) < 2:
+        logging.info("Invalid arguments")
     name = args[1]
-    if chosenMachineIp is not None:
+    if giveAddress:
+        logging.info(f"{chosenMachineIp}")
+    elif chosenMachineIp is not None:
         subprocess.Popen([f'ssh', f'{name}@{chosenMachineIp}']).communicate()
 
 
 if __name__ == '__main__':
     ServerProgram(sys.argv)
-
 
 
 
