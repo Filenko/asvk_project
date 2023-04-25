@@ -7,6 +7,7 @@ import logging
 import subprocess
 import sys
 import time
+import argparse
 
 logging.basicConfig(
     level=logging.INFO,
@@ -65,14 +66,14 @@ def LoadConfig(path="config.json"):
 
 
 def GetCurrentMachines():
-    allMachines = GetAllMachines("./machines")
+    allMachines = GetAllMachines(f"{os.path.abspath(os.getcwd())}/machines")
     machines = []
     for machine_info in allMachines:
-        with open(f"./machines/{machine_info}", "rb") as input_file:
+        with open(f"{os.path.abspath(os.getcwd())}/machines/{machine_info}", "rb") as input_file:
             machineInfo = pickle.load(input_file)
             now = datetime.now()
 
-            machineTimeStamp = os.stat(f"./machines/{machine_info}").st_mtime
+            machineTimeStamp = os.stat(f"{os.path.abspath(os.getcwd())}/machines/{machine_info}").st_mtime
             machineTime = datetime.fromtimestamp(machineTimeStamp)
 
             hour = machineTime.hour
@@ -85,7 +86,7 @@ def GetCurrentMachines():
 
 
 def ChooseMachine(data):
-    hist = LoadHistory("./history.pickle")
+    hist = LoadHistory(f"{os.path.abspath(os.getcwd())}/history.pickle")
     machines = GetCurrentMachines()
     logging.debug("Loaded current machines!")
     machines.sort(key=lambda x: int(x["load_5"]))
@@ -126,18 +127,19 @@ def readServersFingerPrints(path='servers'):
 def ServerProgram(args):
 
     serversFingerPrints = readServersFingerPrints()
-
     if os.getenv('SSH_KEY_FINGERPRINT') in serversFingerPrints:
         serverParameters = json.loads(args[1])
         serverParameters["time"] = datetime.now()
         serverParameters["ip"] = os.getenv('SSH_CONNECTION').split()[0]
-        with open(f'./machines/machine{serverParameters["machine_number"]}.pickle', 'wb') as f:
+        with open(f'{os.path.abspath(os.getcwd())}/machines/machine{serverParameters["machine_number"]}.pickle', 'wb') as f:
             pickle.dump(serverParameters, f)
         return
 
-    giveAddress = False
-    if len(args) >= 2 and args[1] == "giveAddress":
-        giveAddress = True
+    parser = argparse.ArgumentParser(prog="balance", description="Main program of system.")
+    parser.add_argument('username', help='Username on server.')
+    parser.add_argument('-i', action='store_true',
+                        help='Get only ip of server to make rsync to copy files.')
+    args = parser.parse_args()
 
     data = {}
     data["ip"] = os.getenv('SSH_CONNECTION').split()[0]
@@ -145,13 +147,11 @@ def ServerProgram(args):
 
     chosenMachineIp = ChooseMachine(data)
     logging.debug(f"Chose machine function returned: {chosenMachineIp}")
-    if len(args) < 2:
-        logging.info("Invalid arguments")
-    name = args[1]
-    if giveAddress:
+
+    if args.i:
         logging.info(f"{chosenMachineIp}")
     elif chosenMachineIp is not None:
-        subprocess.Popen([f'ssh', f'{name}@{chosenMachineIp}']).communicate()
+        subprocess.Popen([f'ssh', f'{args.username}@{chosenMachineIp}']).communicate()
 
 
 if __name__ == '__main__':

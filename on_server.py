@@ -15,8 +15,9 @@ dct["load_1"] = load_avg[0]
 dct["load_5"] = load_avg[1]
 dct["load_15"] = load_avg[2]
 dct["machine_number"] = machine_number
-print([f"ssh", "root@10.10.10.1", "python3", "balance.py", f"'{json.dumps(dct)}'"])
-subprocess.run([f"ssh", "root@10.10.10.1", "python3", "balance.py", f"'{json.dumps(dct)}'"])
+print([f"ssh", "balance@10.10.10.1", "python3", "balance.py", f"'{json.dumps(dct)}'"])
+subprocess.run([f"ssh", "balance@10.10.10.1", "python3", "balance.py", f"'{json.dumps(dct)}'"])
+
 
 
 
